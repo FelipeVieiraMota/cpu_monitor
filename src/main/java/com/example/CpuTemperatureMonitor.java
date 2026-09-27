@@ -117,6 +117,19 @@ public class CpuTemperatureMonitor extends JFrame {
         );
 
         add(tabs);
+
+
+        CpuHistoryPanel cpuHistoryPanel =
+                new CpuHistoryPanel(
+                        hardware.getProcessor()
+                );
+
+        tabs.addTab(
+                "📈 CPU History",
+                cpuHistoryPanel
+        );
+
+
     }
 
     // =========================================================
