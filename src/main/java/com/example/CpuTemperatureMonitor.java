@@ -12,7 +12,6 @@ import java.awt.geom.Ellipse2D;
 
 public class CpuTemperatureMonitor extends JFrame {
 
-    private final SystemInfo systemInfo;
     private final HardwareAbstractionLayer hardware;
     private final Sensors sensors;
 
@@ -21,30 +20,24 @@ public class CpuTemperatureMonitor extends JFrame {
     private final JLabel maximumLabel = new JLabel("Maximum: --°C");
     private final JLabel cpuNameLabel = new JLabel("CPU");
 
-    private final TemperatureGauge temperatureGauge =
-            new TemperatureGauge();
+    private final TemperatureGauge temperatureGauge = new TemperatureGauge();
 
     private double maximumTemperature = Double.NaN;
 
-    private final Color backgroundColor =
-            new Color(15, 17, 23);
+    private final Color backgroundColor = new Color(15, 17, 23);
 
     public CpuTemperatureMonitor() {
-
-        systemInfo = new SystemInfo();
-        hardware = systemInfo.getHardware();
+        hardware = new SystemInfo().getHardware();
         sensors = hardware.getSensors();
 
         setupWindow();
         createInterface();
-
         updateTemperature();
+        timer();
+    }
 
-        Timer timer = new Timer(
-                2000,
-                event -> updateTemperature()
-        );
-
+    private void timer() {
+        Timer timer = new Timer(2000, event -> updateTemperature());
         timer.setCoalesce(true);
         timer.start();
     }
@@ -52,7 +45,6 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // WINDOW
     // =========================================================
-
     private void setupWindow() {
 
         setTitle("CPU Monitor");
@@ -82,7 +74,6 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // INTERFACE
     // =========================================================
-
     private void createInterface() {
 
         JTabbedPane tabs = new JTabbedPane();
@@ -135,7 +126,6 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // TEMPERATURE INTERFACE
     // =========================================================
-
     private JPanel createTemperaturePanel() {
 
         JPanel mainPanel = new JPanel(
@@ -300,11 +290,7 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // CARD
     // =========================================================
-
-    private JPanel createCard(
-            String title,
-            JLabel valueLabel
-    ) {
+    private JPanel createCard(String title, JLabel valueLabel) {
 
         JPanel card = new JPanel(
                 new BorderLayout(
@@ -366,7 +352,6 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // TEMPERATURE UPDATE
     // =========================================================
-
     private void updateTemperature() {
 
         SwingWorker<Double, Void> worker =
@@ -409,10 +394,7 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // TEMPERATURE UI UPDATE
     // =========================================================
-
-    private void updateInterface(
-            double temperature
-    ) {
+    private void updateInterface(double temperature) {
 
         if (Double.isNaN(maximumTemperature)
                 || temperature > maximumTemperature) {
@@ -483,10 +465,7 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // TEMPERATURE STATUS
     // =========================================================
-
-    private String getTemperatureStatus(
-            double temperature
-    ) {
+    private String getTemperatureStatus(double temperature) {
 
         if (temperature < 50) {
             return "Normal";
@@ -506,10 +485,7 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // TEMPERATURE COLORS
     // =========================================================
-
-    private Color getTemperatureColor(
-            double temperature
-    ) {
+    private Color getTemperatureColor(double temperature) {
 
         if (temperature < 50) {
 
@@ -548,19 +524,15 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // TEMPERATURE GAUGE
     // =========================================================
-
     private class TemperatureGauge extends JPanel {
 
         private double temperature = Double.NaN;
 
         public TemperatureGauge() {
-
             setOpaque(false);
         }
 
-        public void setTemperature(
-                double temperature
-        ) {
+        public void setTemperature(double temperature) {
 
             this.temperature = temperature;
 
@@ -568,102 +540,54 @@ public class CpuTemperatureMonitor extends JFrame {
         }
 
         @Override
-        protected void paintComponent(
-                Graphics graphics
-        ) {
+        protected void paintComponent(Graphics graphics) {
 
             super.paintComponent(graphics);
 
-            Graphics2D g =
-                    (Graphics2D) graphics.create();
+            Graphics2D g = (Graphics2D) graphics.create();
 
-            g.setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON
-            );
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int width = getWidth();
             int height = getHeight();
 
-            int size =
-                    Math.min(width, height) - 40;
+            int size = Math.min(width, height) - 40;
 
-            int x =
-                    (width - size) / 2;
-
-            int y =
-                    (height - size) / 2 - 5;
+            int x = (width - size) / 2;
+            int y = (height - size) / 2 - 5;
 
             // -------------------------------------------------
             // BACKGROUND CIRCLE
             // -------------------------------------------------
 
-            g.setColor(
-                    new Color(
-                            25,
-                            29,
-                            38
-                    )
-            );
+            g.setColor(new Color(25, 29, 38));
 
-            g.fill(
-                    new Ellipse2D.Double(
-                            x,
-                            y,
-                            size,
-                            size
-                    )
-            );
+            g.fill(new Ellipse2D.Double(x, y, size, size));
 
             // -------------------------------------------------
             // BACKGROUND ARC
             // -------------------------------------------------
-
             int margin = 22;
 
-            Arc2D backgroundArc =
-                    new Arc2D.Double(
-                            x + margin,
-                            y + margin,
-                            size - margin * 2,
-                            size - margin * 2,
-                            135,
-                            -270,
-                            Arc2D.OPEN
-                    );
+            Arc2D backgroundArc = new Arc2D.Double(x + margin, y + margin, size - margin * 2, size - margin * 2, 135, -270, Arc2D.OPEN);
 
-            g.setStroke(
-                    new BasicStroke(
-                            15,
-                            BasicStroke.CAP_ROUND,
-                            BasicStroke.JOIN_ROUND
-                    )
-            );
+            g.setStroke(new BasicStroke(15, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-            g.setColor(
-                    new Color(
-                            55,
-                            61,
-                            74
-                    )
-            );
+            g.setColor(new Color(55, 61, 74));
 
             g.draw(backgroundArc);
 
             // -------------------------------------------------
             // TEMPERATURE ARC
             // -------------------------------------------------
-
             if (!Double.isNaN(temperature)) {
 
                 double percentage =
-                        Math.max(
+                        Math.clamp(
+                                temperature
+                                ,
                                 0,
-                                Math.min(
-                                        100,
-                                        temperature
-                                )
-                        );
+                                100);
 
                 double angle =
                         -270 *
@@ -718,61 +642,27 @@ public class CpuTemperatureMonitor extends JFrame {
                     )
             );
 
-            FontMetrics metrics =
-                    g.getFontMetrics();
+            FontMetrics metrics = g.getFontMetrics();
 
-            int textX =
-                    width / 2
-                            - metrics.stringWidth(
-                            temperatureText
-                    ) / 2;
+            int textX = width / 2 - metrics.stringWidth(temperatureText) / 2;
 
-            int textY =
-                    height / 2
-                            + metrics.getAscent()
-                            / 3;
+            int textY = height / 2 + metrics.getAscent() / 3;
 
             g.setColor(Color.WHITE);
 
-            g.drawString(
-                    temperatureText,
-                    textX,
-                    textY
-            );
+            g.drawString(temperatureText, textX, textY);
 
             // -------------------------------------------------
             // CPU LABEL
             // -------------------------------------------------
-
             String cpuText = "CPU";
 
-            g.setFont(
-                    new Font(
-                            "SansSerif",
-                            Font.PLAIN,
-                            13
-                    )
-            );
+            g.setFont(new Font("SansSerif",Font.PLAIN,13));
 
             metrics = g.getFontMetrics();
 
-            g.setColor(
-                    new Color(
-                            130,
-                            138,
-                            155
-                    )
-            );
-
-            g.drawString(
-                    cpuText,
-                    width / 2
-                            - metrics.stringWidth(
-                            cpuText
-                    ) / 2,
-                    textY + 30
-            );
-
+            g.setColor(new Color(130, 138, 155));
+            g.drawString(cpuText,width / 2 - metrics.stringWidth(cpuText) / 2, textY + 30);
             g.dispose();
         }
     }
@@ -780,16 +670,9 @@ public class CpuTemperatureMonitor extends JFrame {
     // =========================================================
     // MAIN
     // =========================================================
-
-    public static void main(
-            String[] args
-    ) {
-
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-
-            CpuTemperatureMonitor application =
-                    new CpuTemperatureMonitor();
-
+            final var application = new CpuTemperatureMonitor();
             application.setVisible(true);
         });
     }
